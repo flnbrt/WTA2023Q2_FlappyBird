@@ -1,0 +1,23 @@
+#mainBody {
+    background: lightgrey;
+}
+
+#headerDiv {
+    text-align: center;
+    color: darkgreen;
+    font-family: Arial, ui-serif;
+}
+
+#gameDiv {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#gameCanvas {
+    width: 432px;
+    height: 768px;
+    border: 1px darkgrey solid;
+}
