@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" type="text/css" href="styles/style.css">
-    <script src="scripts/script.js"></script>
+    <script src="scripts/script.js" defer="defer"></script>
     <title>Flappy Bird</title>
 </head>
 <body id="mainBody">
@@ -16,7 +16,15 @@
     </div>
     <!-- Game !-->
     <div id="gameDiv">
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="gameCanvas" width="432" height="768"></canvas>
+    </div>
+    <div id="scoreDiv">
+        <div id="currentScore">
+            <p>Score: 0</p>
+        </div>
+        <div id="highScore">
+            <p>Highscore: 0</p>
+        </div>
     </div>
 </body>
 </html>
