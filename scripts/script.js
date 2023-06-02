@@ -62,6 +62,11 @@ let gamePlaying = false,
     settingsOpened = false,
     speed = 6.0 * (gameLoopInterval / 40),
     animation = 0,
+    birdAnimation = 0,
+    birdFlyHeight = 0,
+    birdJumpHeight = 7,
+    birdFlyHeightAdjustment = 0,
+    gravity = 0.1,
     settingsPress = 0;
 
 
@@ -71,6 +76,9 @@ function init() {
 
     canvas = document.getElementById("gameCanvas");
     ctx = canvas.getContext("2d");
+
+    // set initial bird fly height
+    birdFlyHeight = (canvas.height / 2 - (bird.height / 2));
 
     // preload all assets
     preloadAssets();
@@ -85,17 +93,11 @@ function gameLoop() {
     // draw assets
     drawAssets();
 
-    if (preloaded) {
-        // move position of buttons on click
-        /*
-        canvas.addEventListener("mousedown", function ()  { settingsPress = 2; console.log("settings pressed") });
-        canvas.addEventListener("mouseup", function ()  { settingsPress = 0; console.log("settings released") });
-        */
-
-        //document.getElementById("test").addEventListener("mouseup", () => console.log("test"));
-
-
+    // game functions
+    if (gamePlaying) {
+        birdFly();
     }
+    collisionDetection();
 }
 
 /*
@@ -161,11 +163,12 @@ function drawAssets() {
     drawBackground();
 
     //drawObstacles();
+
     if (!settingsOpened) {
         drawBird();
     }
 
-    if (!gamePlaying || !settingsOpened) {
+    if (!gamePlaying && !settingsOpened) {
         drawMainScreen();
     }
 
@@ -198,15 +201,24 @@ function drawBird() {
     ctx.drawImage(
         birdImage,
 
-        bird.startLeft + (bird.width * birdVersion), bird.startTop + (bird.height * birdVersion),
+        (bird.startLeft + (bird.width * birdAnimation)) + (bird.width * birdVersion), bird.startTop + (bird.height * birdVersion),
         bird.width, bird.height,
 
-        (canvas.width / 2 - (bird.width / 2)), (canvas.height / 2 - (bird.height / 2)),
+        (canvas.width / 2 - (bird.width / 2)), birdFlyHeight,
         bird.width, bird.height);
+
+    // bird wings animation
+    if (animation % gameLoopInterval === 0) {
+        birdAnimation += 1;
+        if (birdAnimation > 2) { birdAnimation = 0; }
+    }
 
 }
 
 function drawMainScreen() {
+
+    // draw score
+    ctx.fillText("Score:")
 
     // draw flappy bird logo
     ctx.drawImage(
@@ -255,20 +267,52 @@ function drawMainScreen() {
 
 }
 
-function buttonPressed(e) {
-    if (ctx.isPointInPath(settingsButtonImage, e.offsetX, e.offsetY)) {
-        console.log("settings button pressed!")
-        settingsPress = 2;
+function birdFly() {
+
+    // bird flight height adjustment
+    if (birdFlyHeight !== (canvas.height - bird.height)) {
+        birdFlyHeightAdjustment += gravity;
+    }
+    birdFlyHeight = Math.min(birdFlyHeight + birdFlyHeightAdjustment, canvas.height - bird.height);
+
+}
+
+function collisionDetection() {
+
+    // upper canvas border
+    if (birdFlyHeight <= 0) {
+        gamePlaying = false;
+        birdFlyHeightAdjustment = 0;
+    }
+
+    // bottom canvas border
+    if (birdFlyHeight >= (canvas.height - bird.height)) {
+        gamePlaying = false;
+        birdFlyHeightAdjustment = 0;
+    }
+
+    // reset flight height
+    if (!gamePlaying) {
+        birdFlyHeight = (canvas.height / 2) - (bird.height / 2);
     }
 }
 
-function buttonReleased(e) {
+// click actions
+document.addEventListener('click', () => gamePlaying = true);
+window.onclick = () => birdFlyHeightAdjustment -= birdJumpHeight;
 
+// keyboard actions
+document.querySelector("html").onkeydown = function (e) {
+
+    if (e.key === " ") {
+        if (gamePlaying) {
+            birdFlyHeightAdjustment -= birdJumpHeight;
+        } else {
+            gamePlaying = true;
+            birdFlyHeightAdjustment -= birdJumpHeight;
+        }
+    }
 }
-
-
-document.getElementById("gameDiv").addEventListener("mousedown", buttonPressed);
-document.getElementById("gameDiv").addEventListener("mouseup", buttonReleased);
 
 // wait until everything is loaded
 document.addEventListener("DOMContentLoaded", init);
