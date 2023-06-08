@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 body {
     background: lightgrey;
 }
@@ -20,4 +22,84 @@ body {
     width: 432px;
     height: 768px;
     border: 1px darkgrey solid;
+}
+
+#scoreDiv {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#scoreCanvas {
+    width: 432px;
+    height: 50px;
+    border: 1px darkgrey solid;
+}
+
+.flappy-button {
+    background-color: #00BFFF;
+    border: none;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 20px 30px;
+    border-radius: 4px;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.flappy-button:hover {
+    background-color: #009ACD;
+}
+
+.flappy-button:active {
+    background-color: #007BA7;
+}
+
+#playButton {
+    position: absolute;
+    top: calc(384px + 275px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#settingsButton {
+    position: absolute;
+    top: calc(384px + 350px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#settingsButtonBird {
+    position: absolute;
+    top: calc(384px + 50px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#settingsButtonMusic {
+    position: absolute;
+    top: calc(384px + 150px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#settingsButtonSound {
+    position: absolute;
+    top: calc(384px + 250px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#settingsButtonBack {
+    position: absolute;
+    top: calc(384px + 350px);
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

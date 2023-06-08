@@ -9,22 +9,29 @@
     <script src="scripts/script.js" defer="defer"></script>
     <title>Flappy Bird</title>
 </head>
-<body id="mainBody">
-    <!-- Header !-->
-    <div id="headerDiv">
-        <h1>Flappy Bird</h1>
-    </div>
+<body>
+    <!-- audio !-->
+    <audio id="music" src="assets/sfx/music.mp3" loop="loop"></audio>
+    <audio id="flap" src="assets/sfx/flap.mp3"></audio>
+    <audio id="hit" src="assets/sfx/hit.mp3"></audio>
+    <audio id="point" src="assets/sfx/point.mp3"></audio>
+    <audio id="swoosh" src="assets/sfx/swoosh.mp3"></audio>
+    <audio id="die" src="assets/sfx/die.mp3"></audio>
+
     <!-- Game !-->
+    <div id="scoreDiv">
+        <canvas id="scoreCanvas" width="432" height="50"></canvas>
+    </div>
     <div id="gameDiv">
         <canvas id="gameCanvas" width="432" height="768"></canvas>
     </div>
-    <div id="scoreDiv">
-        <div id="currentScore">
-            <p>Score: 0</p>
-        </div>
-        <div id="highScore">
-            <p>Highscore: 0</p>
-        </div>
+    <div id="buttonDiv">
+        <button id="settingsButton" class="flappy-button">Settings</button>
+        <button id="playButton" class="flappy-button">Play</button>
+        <button id="settingsButtonBird" class="flappy-button" style="visibility: hidden">Change bird color</button>
+        <button id="settingsButtonMusic" class="flappy-button" style="visibility: hidden">Toggle music</button>
+        <button id="settingsButtonSound" class="flappy-button" style="visibility: hidden">Toggle sound</button>
+        <button id="settingsButtonBack" class="flappy-button" style="visibility: hidden">Back</button>
     </div>
 </body>
 </html>
