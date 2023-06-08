@@ -21,14 +21,14 @@ const gameLoopInterval = 10,
         height: 38
     },
     obstacle = {
+        width: 78,
+        height: 480,
         topStartLeft: 168,
         topStartTop: 969,
-        topWidth: 78,
-        topHeight: 480,
+        topEndTop: 1449,
         bottomStartLeft: 252,
         bottomStartTop: 969,
-        bottomWidth: 78,
-        bottomHeight: 480,
+        bottomEndTop: 1449,
         gap: 270
     },
     flappyBird = {
@@ -36,20 +36,9 @@ const gameLoopInterval = 10,
         startTop: 273,
         width: 267,
         height: 72
-    },
-    playButton = {
-        startLeft: 1062,
-        startTop: 354,
-        width: 156,
-        height: 87
-    },
-    settingsButton = {
-    startLeft: 1062,
-    startTop: 461,
-    width: 156,
-    height: 87
-    },
-    pipeLocation = () => (Math.random() * ((canvas.height - (obstacle.gap + obstacle.topWidth)) - obstacle.topWidth)) + obstacle.topWidth;
+    };
+
+const pipeLocation = () => (Math.random() * ((canvas.height - (obstacle.gap + obstacle.width)) - obstacle.width)) + obstacle.width;
 
 var preloaded = false,
     canvas,
@@ -61,10 +50,12 @@ var preloaded = false,
     pipeObstacles;
 
 // general game settings
-let currentScore,
+let currentScore = 0,
+    lastScore = 0,
     highScore = 0,
     gameReady = false,
     gamePlaying = false,
+    obstacleRunning = false,
     settingsOpened = false,
     playMusic = false,
     playSound = true,
@@ -72,18 +63,14 @@ let currentScore,
     animation = 0,
     birdAnimation = 0,
     birdFlyHeight = 0,
-    birdJumpHeight = 7,
+    birdJumpHeight = -5,
     birdFlyHeightAdjustment = 0,
-    gravity = 0.1,
-    settingsPress = 0;
+    gravity = 0.1;
 
 
 // initialize
 function init() {
     console.log("init() called!");
-
-    // reset score
-    currentScore = 0;
 
     // gameCanvas
     canvas = document.getElementById("gameCanvas");
@@ -93,14 +80,32 @@ function init() {
     sCanvas = document.getElementById("scoreCanvas");
     sCtx = sCanvas.getContext("2d");
 
-    // set initial bird fly height
-    birdFlyHeight = (canvas.height / 2 - (bird.height / 2));
-
     // preload all assets
     preloadAssets();
 
+    // perform setup
+    setup();
+}
+
+function setup() {
+
+    // reset game variables
+    gameReady = false;
+    gamePlaying = false;
+
+    // reset score
+    lastScore = currentScore;
+    currentScore = 0;
+
+    // reset flight adjustment
+    birdFlyHeightAdjustment = 0;
+
     // generate first three obstacles
-    pipeObstacles = Array(3).fill().map((i, j) => [canvas.width + (i * (obstacle.gap + obstacle.topWidth)), pipeLocation()]);
+    pipeObstacles = Array(3).fill().map((a, i) => [canvas.width + (i * (obstacle.gap + obstacle.width)), pipeLocation()]);
+
+    // set initial bird fly height
+    birdFlyHeight = (canvas.height / 2 - (bird.height / 2));
+
 }
 
 // game loop
@@ -110,7 +115,7 @@ function gameLoop() {
     animation++;
 
     // control sounds
-    audioplayer("music");
+    audioPlayer("music");
 
     // draw assets
     drawAssets();
@@ -174,8 +179,14 @@ function drawAssets() {
 
     if (!gamePlaying) {
         drawMainScreen();
+        obstacleRunning = false;
     } else {
-        drawObstacles()
+        if (!obstacleRunning) {
+            setTimeout(drawObstacles, 1000);
+            obstacleRunning = true;
+        } else {
+            drawObstacles();
+        }
     }
 
     if (gameReady || settingsOpened) {
@@ -214,19 +225,24 @@ function drawBackground() {
         -((animation * speed) % background.width) + background.width, 0, background.width, background.height);
 
     // score
-    sCtx.font = "30px Arial";
     sCtx.drawImage(
         // image
         img,
         // start pos x, start pos y
-        background.startLeft, background.startTop + (background.height - sCanvas.height - 50),
+        876, 30,
         // width, height
         sCanvas.width, sCanvas.height,
         // canvas pos x, canvas pos y
         0, 0,
         // width on canvas, height on canvas
         sCanvas.width, sCanvas.height);
-    sCtx.fillText(`Current Score: ${currentScore}`, 0, 0);
+    sCtx.font = "bold 30px courier";
+
+    if (gamePlaying) {
+        sCtx.fillText(`Current Score: ${currentScore}`, 80, 35);
+    } else {
+        sCtx.fillText(`Last Score: ${lastScore}`, 100, 35);
+    }
 
 }
 
@@ -234,56 +250,58 @@ function drawObstacles() {
 
     pipeObstacles.map(pipe => {
 
+        // move pipe
+        pipe[0] -= speed;
+
         // draw obstacle (top)
         ctx.drawImage(
             // image
             img,
             // start pos x, start pos y
-            obstacle.topStartLeft, obstacle.topStartTop - pipe[1],
+            obstacle.topStartLeft, obstacle.topEndTop - pipe[1],
             // width, height
-            obstacle.topWidth, pipe[1],
+            obstacle.width, pipe[1],
             // canvas pos x, canvas pos y
             pipe[0], 0,
             // width on canvas, height on canvas
-            obstacle.topWidth, pipe[1]);
+            obstacle.width, pipe[1]);
 
         // draw obstacle (bottom)
         ctx.drawImage(
             // image
             img,
             // start pos x, start pos y
-            obstacle.bottomStartLeft + obstacle.topWidth, obstacle.bottomStartTop,
+            obstacle.bottomStartLeft, obstacle.bottomStartTop,
             // width, height
-            obstacle.bottomWidth, canvas.height - pipe[1] + obstacle.gap,
+            obstacle.width, canvas.height - pipe[0] + obstacle.gap,
             // canvas pos x, canvas pos y
             pipe[0], pipe[1] + obstacle.gap,
             // width on canvas, height on canvas
-            obstacle.bottomWidth ,canvas.height - pipe[1] + obstacle.gap);
+            obstacle.width ,canvas.height - pipe[1] + obstacle.gap);
 
         // count score and update pipes
-        if (pipe[0] === (canvas.width / 2 - (obstacle.topWidth / 2))) {
+        if (pipe[0] <= -obstacle.width) {
             // increase current score
             currentScore++;
             // update highscore (if necessary)
             highScore = Math.max(currentScore, highScore);
 
             // remove old pipe and add new one
-            pipeObstacles = [...pipeObstacles.slice(1, [pipeObstacles[pipeObstacles.length - 1][0] + obstacle.gap + obstacle.topWidth, pipeLocation()])];
+            pipeObstacles = [...pipeObstacles.slice(1, [pipeObstacles[pipeObstacles.length - 1][0] + obstacle.gap + obstacle.width, pipeLocation()])];
             console.log(pipeObstacles);
 
             // play audio
-            audioplayer("point");
+            audioPlayer("point");
         }
 
         // collision detection
         if ([
             pipe[0] <= (canvas.width / 10) + bird.width,
-            pipe[0] + obstacle.topWidth >= (canvas.width / 10),
+            pipe[0] + obstacle.width >= (canvas.width / 10),
             pipe[1] > birdFlyHeight || pipe[1] + obstacle.gap < birdFlyHeight + bird.height,
         ].every(element => element)) {
-            gameReady = false
-            gamePlaying = false;
-            audioplayer("hit")
+            audioPlayer("hit")
+            setup();
         }
     });
 
@@ -348,6 +366,7 @@ function drawMainScreen() {
 
     // give instructions to start the game
     if (gameReady && !settingsOpened) {
+        ctx.font = "bold 30px courier";
         ctx.fillText('Press "Space" or', 75, 550);
         ctx.fillText('tap the screen to start!', 0, 580);
     }
@@ -374,25 +393,18 @@ function borderCollisionDetection() {
 
     // upper canvas border
     if (birdFlyHeight <= 0) {
-        gameReady = false;
-        gamePlaying = false;
-        birdFlyHeightAdjustment = 0;
+        audioPlayer("swoosh");
+        setup();
     }
 
     // bottom canvas border
     if (birdFlyHeight >= (canvas.height - bird.height)) {
-        gameReady = false;
-        gamePlaying = false;
-        birdFlyHeightAdjustment = 0;
-    }
-
-    // reset flight height
-    if (!gamePlaying) {
-        birdFlyHeight = (canvas.height / 2) - (bird.height / 2);
+        audioPlayer("die");
+        setup();
     }
 }
 
-function audioplayer(type) {
+function audioPlayer(type) {
     // music
     if (type === "music") {
         if (playMusic) {
@@ -419,12 +431,23 @@ function audioplayer(type) {
                 document.getElementById("hit").volume = 0.1;
                 document.getElementById("hit").play();
                 break;
+            case "die":
+                document.getElementById("die").volume = 0.1;
+                document.getElementById("die").play();
+                break;
+            case "swoosh":
+                document.getElementById("swoosh").volume = 0.1;
+                document.getElementById("swoosh").play();
+                break;
         }
     }
 }
 
 // play button
-document.getElementById("playButton").addEventListener('click', () => gameReady = true);
+document.getElementById("playButton").addEventListener('click', () => {
+    gameReady = true;
+    gamePlaying = false;
+});
 
 // settings button
 document.getElementById("settingsButton").addEventListener('click', () => settingsOpened = true);
@@ -442,7 +465,7 @@ document.addEventListener('click', () => {
 
     if (gameReady) {
         gamePlaying = true
-        audioplayer("flap");
+        audioPlayer("flap");
     }
 
 });
@@ -450,8 +473,8 @@ document.addEventListener('click', () => {
 window.onclick = () => {
 
     if (gamePlaying) {
-        birdFlyHeightAdjustment -= birdJumpHeight
-        audioplayer("flap");
+        birdFlyHeightAdjustment = birdJumpHeight;
+        audioPlayer("flap");
     }
 
 };
@@ -463,17 +486,42 @@ document.getElementById("settingsButtonBack").addEventListener('click', () => se
 // keyboard actions
 document.querySelector("html").onkeydown = function (e) {
 
-    if (gameReady) {
-        if (e.key === " ") {
-            if (gamePlaying) {
-                birdFlyHeightAdjustment -= birdJumpHeight;
-            } else {
-                gamePlaying = true;
-                birdFlyHeightAdjustment -= birdJumpHeight;
+    switch (e.key) {
+        case " ":
+            if (gameReady) {
+                if (gamePlaying) {
+                    birdFlyHeightAdjustment = birdJumpHeight;
+                } else {
+                    gamePlaying = true;
+                    birdFlyHeightAdjustment = birdJumpHeight;
+                }
+                audioPlayer("flap");
             }
-        }
-        audioplayer("flap");
+            break;
+        // force quit game
+        case "Escape":
+            gamePlaying = false;
+            gameReady = false;
+            break;
+        // change bird color
+        case "b":
+            document.getElementById("settingsButtonBird").click();
+            break;
+        // toggle music
+        case "m":
+            document.getElementById("settingsButtonMusic").click();
+            break;
+        // toggle sound
+        case "s":
+            document.getElementById("settingsButtonSound").click();
+            break;
+            case "Enter":
+                if (!gameReady && !settingsOpened && !gamePlaying) {
+                    gameReady = true;
+                }
+                break;
     }
+
 }
 
 // wait until everything is loaded
