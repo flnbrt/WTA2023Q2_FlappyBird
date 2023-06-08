@@ -38,16 +38,13 @@ const gameLoopInterval = 10,
         height: 72
     };
 
-const pipeLocation = () => (Math.random() * ((canvas.height - (obstacle.gap + obstacle.width)) - obstacle.width)) + obstacle.width;
-
 var preloaded = false,
     canvas,
     sCanvas,
     ctx,
     sCtx,
     img,
-    birdVersion = 0,
-    pipeObstacles;
+    birdVersion = 0;
 
 // general game settings
 let currentScore = 0,
@@ -55,6 +52,7 @@ let currentScore = 0,
     highScore = 0,
     gameReady = false,
     gamePlaying = false,
+    hardMode = false,
     obstacleRunning = false,
     settingsOpened = false,
     playMusic = false,
@@ -67,6 +65,7 @@ let currentScore = 0,
     birdFlyHeightAdjustment = 0,
     gravity = 0.1;
 
+const pipeLocation = () => (Math.random() * ((canvas.height - (obstacle.gap + obstacle.width)) - obstacle.width)) + obstacle.width;
 
 // initialize
 function init() {
@@ -93,6 +92,9 @@ function setup() {
     gameReady = false;
     gamePlaying = false;
 
+    // reset game speed
+    speed = 6.0 * (gameLoopInterval / 40)
+
     // reset score
     lastScore = currentScore;
     currentScore = 0;
@@ -102,6 +104,7 @@ function setup() {
 
     // generate first three obstacles
     pipeObstacles = Array(3).fill().map((a, i) => [canvas.width + (i * (obstacle.gap + obstacle.width)), pipeLocation()]);
+    console.log(pipeObstacles);
 
     // set initial bird fly height
     birdFlyHeight = (canvas.height / 2 - (bird.height / 2));
@@ -126,6 +129,10 @@ function gameLoop() {
     }
     borderCollisionDetection();
 
+    // enable hard mode
+    if (hardMode) {
+        applyHardMode();
+    }
 }
 
 /*
@@ -175,18 +182,27 @@ function drawAssets() {
 
     drawBackground();
 
-    drawBird();
+    if (!settingsOpened) {
+        drawBird();
+        document.getElementById("settingsButtonBird").style.visibility = "hidden";
+        document.getElementById("settingsButtonMusic").style.visibility = "hidden";
+        document.getElementById("settingsButtonSound").style.visibility = "hidden";
+        document.getElementById("settingsButtonGameMode").style.visibility = "hidden";
+        document.getElementById("settingsButtonBack").style.visibility = "hidden";
+    } else {
+        drawSettings();
+        document.getElementById("settingsButtonBird").style.visibility = "visible";
+        document.getElementById("settingsButtonMusic").style.visibility = "visible";
+        document.getElementById("settingsButtonSound").style.visibility = "visible";
+        document.getElementById("settingsButtonGameMode").style.visibility = "visible";
+        document.getElementById("settingsButtonBack").style.visibility = "visible";
+    }
 
     if (!gamePlaying) {
         drawMainScreen();
         obstacleRunning = false;
     } else {
-        if (!obstacleRunning) {
-            setTimeout(drawObstacles, 1000);
-            obstacleRunning = true;
-        } else {
-            drawObstacles();
-        }
+        drawObstacles();
     }
 
     if (gameReady || settingsOpened) {
@@ -197,18 +213,6 @@ function drawAssets() {
     if (!gameReady && !settingsOpened) {
         document.getElementById("playButton").style.visibility = "visible";
         document.getElementById("settingsButton").style.visibility = "visible";
-    }
-
-    if (settingsOpened) {
-        document.getElementById("settingsButtonBird").style.visibility = "visible";
-        document.getElementById("settingsButtonMusic").style.visibility = "visible";
-        document.getElementById("settingsButtonSound").style.visibility = "visible";
-        document.getElementById("settingsButtonBack").style.visibility = "visible";
-    } else {
-        document.getElementById("settingsButtonBird").style.visibility = "hidden";
-        document.getElementById("settingsButtonMusic").style.visibility = "hidden";
-        document.getElementById("settingsButtonSound").style.visibility = "hidden";
-        document.getElementById("settingsButtonBack").style.visibility = "hidden";
     }
 
 }
@@ -273,7 +277,7 @@ function drawObstacles() {
             // start pos x, start pos y
             obstacle.bottomStartLeft, obstacle.bottomStartTop,
             // width, height
-            obstacle.width, canvas.height - pipe[0] + obstacle.gap,
+            obstacle.width, canvas.height - pipe[1] + obstacle.gap,
             // canvas pos x, canvas pos y
             pipe[0], pipe[1] + obstacle.gap,
             // width on canvas, height on canvas
@@ -287,7 +291,7 @@ function drawObstacles() {
             highScore = Math.max(currentScore, highScore);
 
             // remove old pipe and add new one
-            pipeObstacles = [...pipeObstacles.slice(1, [pipeObstacles[pipeObstacles.length - 1][0] + obstacle.gap + obstacle.width, pipeLocation()])];
+            pipeObstacles = [...pipeObstacles.slice(1), [pipeObstacles[pipeObstacles.length - 1][0] + obstacle.gap + obstacle.width, pipeLocation()]];
             console.log(pipeObstacles);
 
             // play audio
@@ -295,22 +299,43 @@ function drawObstacles() {
         }
 
         // collision detection
-        if ([
+        /*if ([
             pipe[0] <= (canvas.width / 10) + bird.width,
             pipe[0] + obstacle.width >= (canvas.width / 10),
             pipe[1] > birdFlyHeight || pipe[1] + obstacle.gap < birdFlyHeight + bird.height,
         ].every(element => element)) {
-            audioPlayer("hit")
+            audioPlayer("hit");
+            setup();
+        }*/
+
+        if (pipe[0] <= (canvas.width / 10) + bird.width &&
+            pipe[0] + obstacle.width >= (canvas.width / 10) &&
+            (pipe[1] > birdFlyHeight || pipe[1] + obstacle.gap < birdFlyHeight + bird.height)) {
+            console.log("collision detected!");
+            console.log(`pipe[0]: ${pipe[0]} pipe[1]: ${pipe[1]}`);
+            audioPlayer("hit");
             setup();
         }
-    });
 
+    });
 }
 
 function drawBird() {
 
-    if (!settingsOpened) {
-        // draw bird
+    // draw bird
+    if (gamePlaying) {
+        ctx.drawImage(
+            // image
+            img,
+            // start pos x, start pos y
+            (bird.startLeft + (bird.width * birdAnimation)), bird.startTop + (bird.height * birdVersion),
+            // width, height
+            bird.width, bird.height,
+            // canvas pos x, canvas pos y
+            (canvas.width / 10), birdFlyHeight,
+            // width on canvas, height on canvas
+            bird.width, bird.height);
+    } else {
         ctx.drawImage(
             // image
             img,
@@ -320,19 +345,6 @@ function drawBird() {
             bird.width, bird.height,
             // canvas pos x, canvas pos y
             (canvas.width / 2 - (bird.width / 2)), birdFlyHeight,
-            // width on canvas, height on canvas
-            bird.width, bird.height);
-    } else {
-        // draw bird
-        ctx.drawImage(
-            // image
-            img,
-            // start pos x, start pos y
-            (bird.startLeft + (bird.width * birdAnimation)), bird.startTop + (bird.height * birdVersion),
-            // width, height
-            bird.width, bird.height,
-            // canvas pos x, canvas pos y
-            (canvas.width / 2 - (bird.width / 2)), birdFlyHeight - 100,
             // width on canvas, height on canvas
             bird.width, bird.height);
     }
@@ -379,12 +391,48 @@ function drawMainScreen() {
 
 }
 
+function drawSettings() {
+
+    // draw bird
+    ctx.drawImage(
+        // image
+        img,
+        // start pos x, start pos y
+        (bird.startLeft + (bird.width * birdAnimation)), bird.startTop + (bird.height * birdVersion),
+        // width, height
+        bird.width, bird.height,
+        // canvas pos x, canvas pos y
+        (canvas.width / 2 - (bird.width / 2)), birdFlyHeight - 50,
+        // width on canvas, height on canvas
+        bird.width, bird.height);
+
+    // bird wings animation
+    if (animation % gameLoopInterval === 0) {
+        birdAnimation++;
+        if (birdAnimation > 2) {
+            birdAnimation = 0;
+        }
+    }
+
+    // draw obstacle (top)
+    ctx.drawImage(
+        // image
+        img,
+        // start pos x, start pos y
+        obstacle.topStartLeft, obstacle.topEndTop - 250,
+        // width, height
+        obstacle.width, obstacle.height,
+        // canvas pos x, canvas pos y
+        (canvas.width / 2 - (obstacle.width / 2)), 0,
+        // width on canvas, height on canvas
+        obstacle.width, obstacle.height);
+
+}
+
 function birdFly() {
 
     // bird flight height adjustment
-    if (birdFlyHeight !== (canvas.height - bird.height)) {
-        birdFlyHeightAdjustment += gravity;
-    }
+    birdFlyHeightAdjustment += gravity;
     birdFlyHeight = Math.min(birdFlyHeight + birdFlyHeightAdjustment, canvas.height - bird.height);
 
 }
@@ -402,6 +450,18 @@ function borderCollisionDetection() {
         audioPlayer("die");
         setup();
     }
+}
+
+function applyHardMode() {
+
+    // increase game speed after 10 points
+    if (currentScore > 5) {
+        if (animation % gameLoopInterval === 0) {
+            speed = 6.0 * (gameLoopInterval / 40) + (currentScore / 100);
+        }
+        console.log("current game speed: " + speed);
+    }
+
 }
 
 function audioPlayer(type) {
@@ -481,6 +541,15 @@ window.onclick = () => {
 
 document.getElementById("settingsButtonMusic").addEventListener('click', () => playMusic = !playMusic);
 document.getElementById("settingsButtonSound").addEventListener('click', () => playSound = !playSound);
+document.getElementById("settingsButtonGameMode").addEventListener('click', () => {
+    if (hardMode) {
+        document.getElementById("settingsButtonGameMode").innerHTML = "Game mode: normal";
+        hardMode = false;
+    } else {
+        document.getElementById("settingsButtonGameMode").innerHTML = "Game mode: hard";
+        hardMode = true;
+    }
+});
 document.getElementById("settingsButtonBack").addEventListener('click', () => settingsOpened = false);
 
 // keyboard actions
@@ -498,10 +567,15 @@ document.querySelector("html").onkeydown = function (e) {
                 audioPlayer("flap");
             }
             break;
-        // force quit game
+        // quit
         case "Escape":
-            gamePlaying = false;
-            gameReady = false;
+            if (gameReady || gamePlaying) {
+                gamePlaying = false;
+                gameReady = false;
+            }
+            if (settingsOpened) {
+                document.getElementById("settingsButtonBack").click();
+            }
             break;
         // change bird color
         case "b":
@@ -515,11 +589,11 @@ document.querySelector("html").onkeydown = function (e) {
         case "s":
             document.getElementById("settingsButtonSound").click();
             break;
-            case "Enter":
-                if (!gameReady && !settingsOpened && !gamePlaying) {
-                    gameReady = true;
-                }
-                break;
+        case "Enter":
+            if (!gameReady && !settingsOpened && !gamePlaying) {
+                gameReady = true;
+            }
+            break;
     }
 
 }

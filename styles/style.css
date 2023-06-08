@@ -64,42 +64,49 @@ body {
 
 #playButton {
     position: absolute;
-    top: calc(384px + 275px);
+    top: calc(384px + 325px);
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #settingsButton {
     position: absolute;
-    top: calc(384px + 350px);
+    top: calc(384px + 400px);
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #settingsButtonBird {
     position: absolute;
-    top: calc(384px + 50px);
+    top: calc(384px + 100px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#settingsButtonGameMode {
+    position: absolute;
+    top: calc(384px + 175px);
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #settingsButtonMusic {
     position: absolute;
-    top: calc(384px + 150px);
+    top: calc(384px + 250px);
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #settingsButtonSound {
     position: absolute;
-    top: calc(384px + 250px);
+    top: calc(384px + 325px);
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
 #settingsButtonBack {
     position: absolute;
-    top: calc(384px + 350px);
+    top: calc(384px + 400px);
     left: 50%;
     transform: translate(-50%, -50%);
 }
