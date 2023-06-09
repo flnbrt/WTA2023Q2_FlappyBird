@@ -44,7 +44,9 @@ var preloaded = false,
     ctx,
     sCtx,
     img,
-    birdVersion = 0;
+    birdVersion = 0,
+    pipeVersion = 0,
+    backgroundVersion = 0;
 
 // general game settings
 let currentScore = 0,
@@ -53,8 +55,8 @@ let currentScore = 0,
     gameReady = false,
     gamePlaying = false,
     hardMode = false,
-    obstacleRunning = false,
     settingsOpened = false,
+    visualSettingsOpened = false,
     playMusic = false,
     playSound = true,
     speed = 6.0 * (gameLoopInterval / 40),
@@ -182,25 +184,14 @@ function drawAssets() {
 
     drawBackground();
 
-    if (!settingsOpened) {
-        drawBird();
-        document.getElementById("settingsButtonBird").style.visibility = "hidden";
-        document.getElementById("settingsButtonMusic").style.visibility = "hidden";
-        document.getElementById("settingsButtonSound").style.visibility = "hidden";
-        document.getElementById("settingsButtonGameMode").style.visibility = "hidden";
-        document.getElementById("settingsButtonBack").style.visibility = "hidden";
-    } else {
+    drawButtons();
+
+    if (settingsOpened) {
         drawSettings();
-        document.getElementById("settingsButtonBird").style.visibility = "visible";
-        document.getElementById("settingsButtonMusic").style.visibility = "visible";
-        document.getElementById("settingsButtonSound").style.visibility = "visible";
-        document.getElementById("settingsButtonGameMode").style.visibility = "visible";
-        document.getElementById("settingsButtonBack").style.visibility = "visible";
     }
 
     if (!gamePlaying) {
         drawMainScreen();
-        obstacleRunning = false;
     } else {
         drawObstacles();
     }
@@ -217,16 +208,66 @@ function drawAssets() {
 
 }
 
+// draw buttons
+function drawButtons() {
+    if (!settingsOpened) {
+        drawBird();
+        document.getElementById("settingsButtonVisuals").style.visibility = "hidden";
+        document.getElementById("settingsButtonMusic").style.visibility = "hidden";
+        document.getElementById("settingsButtonSound").style.visibility = "hidden";
+        document.getElementById("settingsButtonGameMode").style.visibility = "hidden";
+        document.getElementById("settingsButtonBack").style.visibility = "hidden";
+    } else {
+        if (!visualSettingsOpened) {
+            document.getElementById("settingsButtonVisuals").style.visibility = "visible";
+            document.getElementById("settingsButtonMusic").style.visibility = "visible";
+            document.getElementById("settingsButtonSound").style.visibility = "visible";
+            document.getElementById("settingsButtonGameMode").style.visibility = "visible";
+            document.getElementById("settingsButtonBack").style.visibility = "visible";
+            document.getElementById("settingsButtonVisualBird").style.visibility = "hidden";
+            document.getElementById("settingsButtonVisualBackground").style.visibility = "hidden";
+            document.getElementById("settingsButtonVisualPipe").style.visibility = "hidden";
+        } else {
+            document.getElementById("settingsButtonVisuals").style.visibility = "hidden";
+            document.getElementById("settingsButtonMusic").style.visibility = "hidden";
+            document.getElementById("settingsButtonSound").style.visibility = "hidden";
+            document.getElementById("settingsButtonGameMode").style.visibility = "hidden";
+            document.getElementById("settingsButtonVisualBird").style.visibility = "visible";
+            document.getElementById("settingsButtonVisualBackground").style.visibility = "visible";
+            document.getElementById("settingsButtonVisualPipe").style.visibility = "visible";
+            document.getElementById("settingsButtonBack").style.visibility = "visible";
+        }
+    }
+}
+
 // draw background
 function drawBackground() {
 
     // draw world background (left part)
-    ctx.drawImage(img, background.startLeft, background.startTop, background.width, background.height,
-        -((animation * speed) % background.width), 0, background.width, background.height);
+    ctx.drawImage(
+        // image
+        img,
+        // start pos x, start pos y
+        background.startLeft + (backgroundVersion * background.width),
+        // width, height
+        background.startTop, background.width,
+        // canvas pos x, canvas pos y
+        background.height, -((animation * speed) % background.width),
+        // width on canvas, height on canvas
+        0, background.width, background.height);
 
     // draw world background (right part)
-    ctx.drawImage(img, background.startLeft, background.startTop, background.width, background.height,
-        -((animation * speed) % background.width) + background.width, 0, background.width, background.height);
+    ctx.drawImage(
+        // image
+        img,
+        // start pos x, start pos y
+        background.startLeft + (backgroundVersion * background.width),
+        // width, height
+        background.startTop, background.width,
+        // canvas pos x, canvas pos y
+        background.height, -((animation * speed) % background.width) + background.width,
+        // width on canvas, height on canvas
+        0, background.width, background.height);
 
     // score
     sCtx.drawImage(
@@ -262,7 +303,7 @@ function drawObstacles() {
             // image
             img,
             // start pos x, start pos y
-            obstacle.topStartLeft, obstacle.topEndTop - pipe[1],
+            obstacle.topStartLeft - (pipeVersion * obstacle.topStartLeft), obstacle.topEndTop - pipe[1],
             // width, height
             obstacle.width, pipe[1],
             // canvas pos x, canvas pos y
@@ -275,7 +316,7 @@ function drawObstacles() {
             // image
             img,
             // start pos x, start pos y
-            obstacle.bottomStartLeft, obstacle.bottomStartTop,
+            obstacle.bottomStartLeft - (pipeVersion * 168), obstacle.bottomStartTop,
             // width, height
             obstacle.width, canvas.height - pipe[1] + obstacle.gap,
             // canvas pos x, canvas pos y
@@ -299,15 +340,6 @@ function drawObstacles() {
         }
 
         // collision detection
-        /*if ([
-            pipe[0] <= (canvas.width / 10) + bird.width,
-            pipe[0] + obstacle.width >= (canvas.width / 10),
-            pipe[1] > birdFlyHeight || pipe[1] + obstacle.gap < birdFlyHeight + bird.height,
-        ].every(element => element)) {
-            audioPlayer("hit");
-            setup();
-        }*/
-
         if (pipe[0] <= (canvas.width / 10) + bird.width &&
             pipe[0] + obstacle.width >= (canvas.width / 10) &&
             (pipe[1] > birdFlyHeight || pipe[1] + obstacle.gap < birdFlyHeight + bird.height)) {
@@ -419,7 +451,7 @@ function drawSettings() {
         // image
         img,
         // start pos x, start pos y
-        obstacle.topStartLeft, obstacle.topEndTop - 250,
+        obstacle.topStartLeft - (pipeVersion * obstacle.topStartLeft), obstacle.topEndTop - 250,
         // width, height
         obstacle.width, obstacle.height,
         // canvas pos x, canvas pos y
@@ -512,12 +544,25 @@ document.getElementById("playButton").addEventListener('click', () => {
 // settings button
 document.getElementById("settingsButton").addEventListener('click', () => settingsOpened = true);
 
+// settings button visuals
+document.getElementById("settingsButtonVisuals").addEventListener('click', () => visualSettingsOpened = !visualSettingsOpened);
+
 // settings button change bird color
-document.getElementById("settingsButtonBird").addEventListener('click', () => {
+document.getElementById("settingsButtonVisualBird").addEventListener('click', () => {
     birdVersion++;
     if (birdVersion > 2) {
         birdVersion = 0;
     }
+});
+
+// settings button change background
+document.getElementById("settingsButtonVisualBackground").addEventListener('click', () => {
+   backgroundVersion = !backgroundVersion;
+});
+
+// settings button change pipe color
+document.getElementById("settingsButtonVisualPipe").addEventListener('click', () => {
+    pipeVersion = !pipeVersion;
 });
 
 // click actions
@@ -550,7 +595,13 @@ document.getElementById("settingsButtonGameMode").addEventListener('click', () =
         hardMode = true;
     }
 });
-document.getElementById("settingsButtonBack").addEventListener('click', () => settingsOpened = false);
+document.getElementById("settingsButtonBack").addEventListener('click', () => {
+    if (!visualSettingsOpened) {
+        settingsOpened = false;
+    } else {
+        visualSettingsOpened = false;
+    }
+});
 
 // keyboard actions
 document.querySelector("html").onkeydown = function (e) {
@@ -573,7 +624,7 @@ document.querySelector("html").onkeydown = function (e) {
                 gamePlaying = false;
                 gameReady = false;
             }
-            if (settingsOpened) {
+            if (settingsOpened || visualSettingsOpened) {
                 document.getElementById("settingsButtonBack").click();
             }
             break;
@@ -590,7 +641,7 @@ document.querySelector("html").onkeydown = function (e) {
             document.getElementById("settingsButtonSound").click();
             break;
         case "Enter":
-            if (!gameReady && !settingsOpened && !gamePlaying) {
+            if (!gameReady && !gamePlaying && !settingsOpened && !visualSettingsOpened) {
                 gameReady = true;
             }
             break;
