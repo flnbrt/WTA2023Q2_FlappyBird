@@ -38,28 +38,30 @@ body {
     border: 1px darkgrey solid;
 }
 
+/*
+    Button design taken from https://www.bestcssbuttongenerator.com/
+ */
 .flappy-button {
-    background-color: #00BFFF;
-    border: none;
-    color: white;
-    text-align: center;
+    width: 400px;
+    box-shadow: 0 1px 0 0 #1c1b18;
+    background: #eae0c2 linear-gradient(to bottom, #eae0c2 5%, #ddd89c 100%);
+    border-radius: 15px;
+    border: 2px solid #333029;
     display: inline-block;
-    font-size: 22px;
     cursor: pointer;
-    padding: 20px 30px;
-    border-radius: 4px;
-    text-decoration: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease;
+    color: #505739;
     font-family: 'Press Start 2P', cursive;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 20px 30px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #ffffff;
 }
-
 .flappy-button:hover {
-    background-color: #009ACD;
+    background: #ddd89c linear-gradient(to bottom, #ddd89c 5%, #eae0c2 100%);
 }
-
 .flappy-button:active {
-    background-color: #007BA7;
+    background: #ddd89c linear-gradient(to bottom, #ddd89c 5%, #ccc2a6 100%);
 }
 
 #playButton {

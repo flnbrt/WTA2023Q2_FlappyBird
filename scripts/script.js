@@ -240,12 +240,12 @@ function drawBackground() {
         0, 0,
         // width on canvas, height on canvas
         sCanvas.width, sCanvas.height);
-    sCtx.font = "bold 30px courier";
+    sCtx.font = "20px 'Press Start 2P'";
 
     if (gamePlaying) {
-        sCtx.fillText(`Current Score: ${currentScore}`, 80, 35);
+        sCtx.fillText(`Current Score: ${currentScore}`, 60, 37.5);
     } else {
-        sCtx.fillText(`Last Score: ${lastScore}`, 100, 35);
+        sCtx.fillText(`Last Score: ${lastScore}`, 85, 37.5);
     }
 
 }
@@ -378,15 +378,15 @@ function drawMainScreen() {
 
     // give instructions to start the game
     if (gameReady && !settingsOpened) {
-        ctx.font = "bold 30px courier";
-        ctx.fillText('Press "Space" or', 75, 550);
-        ctx.fillText('tap the screen to start!', 0, 580);
+        ctx.font = "20px 'Press Start 2P'";
+        ctx.fillText('Press "Space" or', 55, 550);
+        ctx.fillText('tap the screen!', 60, 580);
     }
 
     // draw current highscore
     if (!settingsOpened) {
-        ctx.font = "bold 30px courier";
-        ctx.fillText(`Highscore: ${highScore}`, 110, 240);
+        ctx.font = "20px 'Press Start 2P'";
+        ctx.fillText(`Highscore: ${highScore}`, 95, 240);
     }
 
 }
