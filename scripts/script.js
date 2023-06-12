@@ -97,6 +97,9 @@ function setup() {
     // reset game speed
     speed = 6.0 * (gameLoopInterval / 40)
 
+    // reset obstacle gap
+    obstacle.gap = 270;
+
     // reset score
     lastScore = currentScore;
     currentScore = 0;
@@ -106,7 +109,6 @@ function setup() {
 
     // generate first three obstacles
     pipeObstacles = Array(3).fill().map((a, i) => [canvas.width + (i * (obstacle.gap + obstacle.width)), pipeLocation()]);
-    console.log(pipeObstacles);
 
     // set initial bird fly height
     birdFlyHeight = (canvas.height / 2 - (bird.height / 2));
@@ -333,7 +335,6 @@ function drawObstacles() {
 
             // remove old pipe and add new one
             pipeObstacles = [...pipeObstacles.slice(1), [pipeObstacles[pipeObstacles.length - 1][0] + obstacle.gap + obstacle.width, pipeLocation()]];
-            console.log(pipeObstacles);
 
             // play audio
             audioPlayer("point");
@@ -343,8 +344,6 @@ function drawObstacles() {
         if (pipe[0] <= (canvas.width / 10) + bird.width &&
             pipe[0] + obstacle.width >= (canvas.width / 10) &&
             (pipe[1] > birdFlyHeight || pipe[1] + obstacle.gap < birdFlyHeight + bird.height)) {
-            console.log("collision detected!");
-            console.log(`pipe[0]: ${pipe[0]} pipe[1]: ${pipe[1]}`);
             audioPlayer("hit");
             setup();
         }
@@ -459,6 +458,11 @@ function drawSettings() {
         // width on canvas, height on canvas
         obstacle.width, obstacle.height);
 
+    // set button texts
+    document.getElementById("settingsButtonMusic").innerHTML = `Music: ${playMusic ? "ON" : "OFF"}`;
+    document.getElementById("settingsButtonSound").innerHTML = `Sound: ${playSound ? "ON" : "OFF"}`;
+    document.getElementById("settingsButtonGameMode").innerHTML = `Game Mode: ${hardMode ? "HARD" : "NORMAL"}`;
+
 }
 
 function birdFly() {
@@ -486,14 +490,17 @@ function borderCollisionDetection() {
 
 function applyHardMode() {
 
-    // increase game speed after 10 points
-    if (currentScore > 5) {
-        if (animation % gameLoopInterval === 0) {
-            speed = 6.0 * (gameLoopInterval / 40) + (currentScore / 100);
-        }
-        console.log("current game speed: " + speed);
-    }
+    if (gamePlaying) {
+        // increase game speed
+        /*if (currentScore > 5) {
+            if (animation % gameLoopInterval === 0) {
+                speed = 6.0 * ((gameLoopInterval / 40) + (currentScore / 100) * 1.5);
+            }
+        }*/
 
+        // decrease obstacle gap
+        obstacle.gap = Math.max(150, Math.max(270 - (currentScore * 10), (obstacle.gap - 0.2)));
+    }
 }
 
 function audioPlayer(type) {
@@ -586,22 +593,8 @@ window.onclick = () => {
 
 document.getElementById("settingsButtonMusic").addEventListener('click', () => playMusic = !playMusic);
 document.getElementById("settingsButtonSound").addEventListener('click', () => playSound = !playSound);
-document.getElementById("settingsButtonGameMode").addEventListener('click', () => {
-    if (hardMode) {
-        document.getElementById("settingsButtonGameMode").innerHTML = "Game mode: normal";
-        hardMode = false;
-    } else {
-        document.getElementById("settingsButtonGameMode").innerHTML = "Game mode: hard";
-        hardMode = true;
-    }
-});
-document.getElementById("settingsButtonBack").addEventListener('click', () => {
-    if (!visualSettingsOpened) {
-        settingsOpened = false;
-    } else {
-        visualSettingsOpened = false;
-    }
-});
+document.getElementById("settingsButtonGameMode").addEventListener('click', () => hardMode = !hardMode);
+document.getElementById("settingsButtonBack").addEventListener('click', () => !visualSettingsOpened ? settingsOpened = false : visualSettingsOpened = false);
 
 // keyboard actions
 document.querySelector("html").onkeydown = function (e) {
@@ -628,9 +621,17 @@ document.querySelector("html").onkeydown = function (e) {
                 document.getElementById("settingsButtonBack").click();
             }
             break;
+        // change background color
+        case "v":
+            document.getElementById("settingsButtonVisualBackground").click();
+            break;
+        // change pipe color
+        case "n":
+            document.getElementById("settingsButtonVisualPipe").click();
+            break;
         // change bird color
         case "b":
-            document.getElementById("settingsButtonBird").click();
+            document.getElementById("settingsButtonVisualBird").click();
             break;
         // toggle music
         case "m":
@@ -640,6 +641,11 @@ document.querySelector("html").onkeydown = function (e) {
         case "s":
             document.getElementById("settingsButtonSound").click();
             break;
+        // toggle game mode
+        case "g":
+            document.getElementById("settingsButtonGameMode").click();
+            break;
+        // quick start
         case "Enter":
             if (!gameReady && !gamePlaying && !settingsOpened && !visualSettingsOpened) {
                 gameReady = true;
