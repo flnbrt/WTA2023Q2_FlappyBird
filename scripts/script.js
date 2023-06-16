@@ -65,7 +65,7 @@ let currentScore = 0,
     birdFlyHeight = 0,
     birdJumpHeight = -5,
     birdFlyHeightAdjustment = 0,
-    gravity = 0.1;
+    gravity = 0.1 / speed;
 
 const pipeLocation = () => (Math.random() * ((canvas.height - (obstacle.gap + obstacle.width)) - obstacle.width)) + obstacle.width;
 
@@ -468,7 +468,7 @@ function drawSettings() {
 function birdFly() {
 
     // bird flight height adjustment
-    birdFlyHeightAdjustment += gravity;
+    birdFlyHeightAdjustment += (speed * gravity);
     birdFlyHeight = Math.min(birdFlyHeight + birdFlyHeightAdjustment, canvas.height - bird.height);
 
 }
@@ -492,14 +492,13 @@ function applyHardMode() {
 
     if (gamePlaying) {
         // increase game speed
-        /*if (currentScore > 5) {
-            if (animation % gameLoopInterval === 0) {
-                speed = 6.0 * ((gameLoopInterval / 40) + (currentScore / 100) * 1.5);
-            }
-        }*/
+        if ((animation * speed) % background.width === (background.width - speed)) {
+            speed = Math.round(speed * 100 + ((currentScore > 0 && currentScore % 2 === 0) ? 25 : 0)) / 100;
+            console.log("current game speed: " + speed);
+        }
 
         // decrease obstacle gap
-        obstacle.gap = Math.max(150, Math.max(270 - (currentScore * 10), (obstacle.gap - 0.2)));
+        obstacle.gap = Math.max(150, Math.max(270 - (currentScore * 5), (obstacle.gap - 0.2)));
     }
 }
 
@@ -563,14 +562,10 @@ document.getElementById("settingsButtonVisualBird").addEventListener('click', ()
 });
 
 // settings button change background
-document.getElementById("settingsButtonVisualBackground").addEventListener('click', () => {
-   backgroundVersion = !backgroundVersion;
-});
+document.getElementById("settingsButtonVisualBackground").addEventListener('click', () => backgroundVersion = !backgroundVersion);
 
 // settings button change pipe color
-document.getElementById("settingsButtonVisualPipe").addEventListener('click', () => {
-    pipeVersion = !pipeVersion;
-});
+document.getElementById("settingsButtonVisualPipe").addEventListener('click', () => pipeVersion = !pipeVersion);
 
 // click actions
 document.addEventListener('click', () => {
@@ -599,8 +594,10 @@ document.getElementById("settingsButtonBack").addEventListener('click', () => !v
 // keyboard actions
 document.querySelector("html").onkeydown = function (e) {
 
-    switch (e.key) {
-        case " ":
+    switch (e.code) {
+
+        // flap
+        case "Space":
             if (gameReady) {
                 if (gamePlaying) {
                     birdFlyHeightAdjustment = birdJumpHeight;
@@ -611,6 +608,7 @@ document.querySelector("html").onkeydown = function (e) {
                 audioPlayer("flap");
             }
             break;
+
         // quit
         case "Escape":
             if (gameReady || gamePlaying) {
@@ -618,41 +616,54 @@ document.querySelector("html").onkeydown = function (e) {
                 gameReady = false;
             }
             if (settingsOpened || visualSettingsOpened) {
-                document.getElementById("settingsButtonBack").click();
+                !visualSettingsOpened ? settingsOpened = false : visualSettingsOpened = false
             }
             break;
+
         // change background color
-        case "v":
-            document.getElementById("settingsButtonVisualBackground").click();
+        case "KeyV":
+            backgroundVersion = !backgroundVersion;
             break;
+
         // change pipe color
-        case "n":
-            document.getElementById("settingsButtonVisualPipe").click();
+        case "KeyN":
+            pipeVersion = !pipeVersion;
             break;
+
         // change bird color
-        case "b":
-            document.getElementById("settingsButtonVisualBird").click();
+        case "KeyB":
+            birdVersion++;
+            if (birdVersion > 2) {
+                birdVersion = 0;
+            }
             break;
+
         // toggle music
-        case "m":
-            document.getElementById("settingsButtonMusic").click();
+        case "KeyM":
+            playMusic = !playMusic;
             break;
+
         // toggle sound
-        case "s":
-            document.getElementById("settingsButtonSound").click();
+        case "KeyS":
+            playSound = !playSound;
             break;
+
         // toggle game mode
-        case "g":
-            document.getElementById("settingsButtonGameMode").click();
+        case "KeyG":
+            hardMode = !hardMode;
             break;
+
         // quick start
         case "Enter":
             if (!gameReady && !gamePlaying && !settingsOpened && !visualSettingsOpened) {
                 gameReady = true;
             }
             break;
-    }
+        // no defined key
+        default:
+            break;
 
+    }
 }
 
 // wait until everything is loaded

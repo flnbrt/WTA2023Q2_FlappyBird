@@ -29,9 +29,12 @@ The following keybindings are available:
 - `ESC`: Exit/Reset the game
 - `M`: Mute/Unmute the music
 - `S`: Mute/Unmute the sound
-- `Enter`: Quick-Start game
+- `Enter`: Quick-Start game (only in main menu)
 - `Space`: Jump
+- `V`: change background
 - `B`: change bird color
+- `N`: change pipe color
+- `G`: change difficulty
 
 ## Game-Options
 
@@ -76,8 +79,8 @@ with a pipe or the ground.
 
 The difficulty can be set to two different levels (normal or hard).
 
-In game mode `normal`, the game speed is set to a fixed value.
-In game mode `hard`, the game speed increases after every gained score.
+In game mode `normal`, the game speed and pipe gap are set to a fixed value.
+In game mode `hard`, the game speed increases and the pipe gap decreases after every gained score.
 
 ## Credits
 
