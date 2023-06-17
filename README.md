@@ -26,7 +26,7 @@ Alternative: [Play the game online](https://flappybird.fambreit.com/)
 
 ## Known Bugs
 
-- In hard mode enabled, the background may flicker when the game speed increases
+- [In hard mode enabled, the background may flicker when the game speed increases](https://github.com/flnbrt/WTA2023Q2_FlappyBird/issues/17)
 
 ## Project Plan
 
