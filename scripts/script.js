@@ -86,6 +86,9 @@ function init() {
 
     // perform setup
     setup();
+
+    // set initial window size
+    resizeCanvas();
 }
 
 function setup() {
@@ -184,7 +187,6 @@ function preloadAssets() {
 // draw assets
 function drawAssets() {
 
-    resizeCanvas();
 
     drawBackground();
 
@@ -478,7 +480,7 @@ function drawSettings() {
 function resizeCanvas() {
 
     let aspectRatio = 768 / 432,
-        windowHeight = (window.innerHeight - 66),
+        windowHeight = (window.innerHeight - 69),
         windowWidth = (windowHeight / aspectRatio),
         buttonWidth = windowWidth - 32;
 
@@ -592,6 +594,9 @@ function audioPlayer(type) {
         }
     }
 }
+
+// windows resize
+window.addEventListener('resize', () => resizeCanvas());
 
 // play button
 document.getElementById("playButton").addEventListener('click', () => {
