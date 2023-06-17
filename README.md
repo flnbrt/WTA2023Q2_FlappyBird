@@ -6,6 +6,8 @@
 
 - [Overview](#Overview)
 - [Installation](#Installation)
+- [Known Bugs](#Known-Bugs)
+- [Project plan](#Project-Plan)
 - [Keybindings](#Keybindings)
 - [Game Options](#Game-Options)
 - [Credits](#Credits)
@@ -20,6 +22,16 @@ The game is over when the bird touches the ground or a pipe.
 
 Copy the repository to your local machine and open the
 `index.html` file in your browser.
+Alternative: [Play the game online](https://flappybird.fambreit.com/)
+
+## Known Bugs
+
+- In hard mode enabled, the background may flicker when the game speed increases
+
+## Project Plan
+
+![img.png](./images/project-plan.png)
+The project plan can be found [here](https://github.com/users/flnbrt/projects/1).
 
 ## Keybindings
 
@@ -88,4 +100,5 @@ This game is based on the help of the following contributions:
 - [FHDW](https://github.com/FHDW)
 - [Flappy Bird Javascript](https://codepen.io/ju-az/pen/eYJQwLx/)
 - [Flappy Bird SpriteSheet](https://www.spriters-resource.com/mobile/flappybird/sheet/59894/)
+- [Flappy Bird Sound Effects](https://www.sounds-resource.com/mobile/flappybird/sound/5309/)
 - [Best CSS Button Generator](https://www.bestcssbuttongenerator.com/)
