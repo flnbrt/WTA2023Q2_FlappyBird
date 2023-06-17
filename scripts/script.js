@@ -184,6 +184,8 @@ function preloadAssets() {
 // draw assets
 function drawAssets() {
 
+    resizeCanvas();
+
     drawBackground();
 
     drawButtons();
@@ -286,9 +288,13 @@ function drawBackground() {
     sCtx.font = "20px 'Press Start 2P'";
 
     if (gamePlaying) {
-        sCtx.fillText(`Current Score: ${currentScore}`, 60, 37.5);
+        let currentScoreText = `Current Score: ${currentScore}`;
+        let currentScoreWidth = sCtx.measureText(currentScoreText).width;
+        sCtx.fillText(currentScoreText, (sCanvas.width / 2) - (currentScoreWidth / 2), 37.5);
     } else {
-        sCtx.fillText(`Last Score: ${lastScore}`, 85, 37.5);
+        let lastScoreText = `Current Score: ${lastScore}`;
+        let lastScoreWidth = sCtx.measureText(lastScoreText).width;
+        sCtx.fillText(lastScoreText, (sCanvas.width / 2) - (lastScoreWidth / 2), 37.5);
     }
 
 }
@@ -416,8 +422,12 @@ function drawMainScreen() {
 
     // draw current highscore
     if (!settingsOpened) {
+
+        let highscoreText = `Current Score: ${highScore}`;
+        let highscoreWidth = sCtx.measureText(highscoreText).width;
+
         ctx.font = "20px 'Press Start 2P'";
-        ctx.fillText(`Highscore: ${highScore}`, 95, 240);
+        ctx.fillText(highscoreText, (canvas.width / 2) - (highscoreWidth / 2), 240);
     }
 
 }
@@ -463,6 +473,48 @@ function drawSettings() {
     document.getElementById("settingsButtonSound").innerHTML = `Sound: ${playSound ? "ON" : "OFF"}`;
     document.getElementById("settingsButtonGameMode").innerHTML = `Game Mode: ${hardMode ? "HARD" : "NORMAL"}`;
 
+}
+
+function resizeCanvas() {
+
+    let aspectRatio = 768 / 432,
+        windowHeight = (window.innerHeight - 66),
+        windowWidth = (windowHeight / aspectRatio),
+        buttonWidth = windowWidth - 32;
+
+
+    // game canvas
+    document.getElementById("gameCanvas").style.height = windowHeight + "px";
+    document.getElementById("gameCanvas").style.width = windowWidth + "px";
+
+    // score canvas
+    document.getElementById("scoreCanvas").style.width = windowWidth + "px";
+
+    // buttons: main
+    document.getElementById("playButton").style.top = windowHeight - 125 + "px";
+    document.getElementById("playButton").style.width = buttonWidth + "px";
+    document.getElementById("settingsButton").style.top = windowHeight - 50 + "px";
+    document.getElementById("settingsButton").style.width = buttonWidth + "px";
+
+    // buttons: settings
+    document.getElementById("settingsButtonVisuals").style.top = windowHeight - 350 + "px";
+    document.getElementById("settingsButtonVisuals").style.width = buttonWidth + "px";
+    document.getElementById("settingsButtonGameMode").style.top = windowHeight - 275 + "px";
+    document.getElementById("settingsButtonGameMode").style.width = buttonWidth + "px";
+    document.getElementById("settingsButtonMusic").style.top = windowHeight - 200 + "px";
+    document.getElementById("settingsButtonMusic").style.width = buttonWidth + "px";
+    document.getElementById("settingsButtonSound").style.top = windowHeight - 125 + "px";
+    document.getElementById("settingsButtonSound").style.width = buttonWidth + "px";
+    document.getElementById("settingsButtonBack").style.top = windowHeight - 50 + "px";
+    document.getElementById("settingsButtonBack").style.width = buttonWidth + "px";
+
+    // buttons: visuals
+    document.getElementById("settingsButtonVisualBird").style.top = windowHeight - 275 + "px";
+    document.getElementById("settingsButtonVisualBird").style.width = buttonWidth + "px";
+    document.getElementById("settingsButtonVisualBackground").style.top = windowHeight - 200 + "px";
+    document.getElementById("settingsButtonVisualBackground").style.width = buttonWidth + "px";
+    document.getElementById("settingsButtonVisualPipe").style.top = windowHeight - 125 + "px";
+    document.getElementById("settingsButtonVisualPipe").style.width = buttonWidth + "px";
 }
 
 function birdFly() {
