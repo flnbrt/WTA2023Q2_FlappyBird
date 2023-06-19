@@ -340,7 +340,7 @@ function drawObstacles() {
             currentScore++;
             // update highscore (if necessary)
             highScore = Math.max(currentScore, highScore);
-            setCookie("highscore", highScore, 7)
+            setCookie("highscore", highScore, 7);
 
             // remove old pipe and add new one
             pipeObstacles = [...pipeObstacles.slice(1), [pipeObstacles[pipeObstacles.length - 1][0] + obstacle.gap + obstacle.width, pipeLocation()]];
