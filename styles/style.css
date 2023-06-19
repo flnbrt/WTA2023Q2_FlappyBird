@@ -34,6 +34,26 @@ body {
     justify-content: center;
 }
 
+#creditsDiv {
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    max-width: 90%;
+    box-shadow: 0 1px 0 0 #1c1b18;
+    background: #eae0c2 linear-gradient(to bottom, #eae0c2 5%, #ddd89c 100%);
+    border-radius: 15px;
+    border: 2px solid #333029;
+    display: inline-block;
+    cursor: pointer;
+    color: #505739;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 20px 30px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #ffffff;
+}
+
 #scoreCanvas {
     border: 1px darkgrey solid;
 }
@@ -71,6 +91,12 @@ body {
 }
 
 #settingsButton {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#creditsButton {
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);

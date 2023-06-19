@@ -51,7 +51,7 @@ var preloaded = false,
 // general game settings
 let currentScore = 0,
     lastScore = 0,
-    highScore = getCookie("highscore"),
+    highScore = getCookie("flappy_highscore"),
     gameReady = false,
     gamePlaying = false,
     hardMode = false,
@@ -205,11 +205,13 @@ function drawAssets() {
     if (gameReady || settingsOpened) {
         document.getElementById("playButton").style.visibility = "hidden";
         document.getElementById("settingsButton").style.visibility = "hidden";
+        document.getElementById("creditsButton").style.visibility = "hidden";
     }
 
     if (!gameReady && !settingsOpened) {
         document.getElementById("playButton").style.visibility = "visible";
         document.getElementById("settingsButton").style.visibility = "visible";
+        document.getElementById("creditsButton").style.visibility = "visible";
     }
 
 }
@@ -340,7 +342,7 @@ function drawObstacles() {
             currentScore++;
             // update highscore (if necessary)
             highScore = Math.max(currentScore, highScore);
-            setCookie("highscore", highScore, 7);
+            setCookie("flappy_highscore", highScore, 7);
 
             // remove old pipe and add new one
             pipeObstacles = [...pipeObstacles.slice(1), [pipeObstacles[pipeObstacles.length - 1][0] + obstacle.gap + obstacle.width, pipeLocation()]];
@@ -494,10 +496,12 @@ function resizeCanvas() {
     document.getElementById("scoreCanvas").style.width = windowWidth + "px";
 
     // buttons: main
-    document.getElementById("playButton").style.top = windowHeight - 125 + "px";
+    document.getElementById("playButton").style.top = windowHeight - 200 + "px";
     document.getElementById("playButton").style.width = buttonWidth + "px";
-    document.getElementById("settingsButton").style.top = windowHeight - 50 + "px";
+    document.getElementById("settingsButton").style.top = windowHeight - 125 + "px";
     document.getElementById("settingsButton").style.width = buttonWidth + "px";
+    document.getElementById("creditsButton").style.top = windowHeight - 50 + "px";
+    document.getElementById("creditsButton").style.width = buttonWidth + "px";
 
     // buttons: settings
     document.getElementById("settingsButtonVisuals").style.top = windowHeight - 350 + "px";
@@ -636,6 +640,9 @@ document.getElementById("playButton").addEventListener('click', () => {
 
 // settings button
 document.getElementById("settingsButton").addEventListener('click', () => settingsOpened = true);
+
+// credits button
+document.getElementById("creditsButton").addEventListener('click', () => document.getElementById("creditsDiv").style.visibility === "hidden" ? document.getElementById("creditsDiv").style.visibility = "visible" : document.getElementById("creditsDiv").style.visibility = "hidden");
 
 // settings button visuals
 document.getElementById("settingsButtonVisuals").addEventListener('click', () => visualSettingsOpened = !visualSettingsOpened);
