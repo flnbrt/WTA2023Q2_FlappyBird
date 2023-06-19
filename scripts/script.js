@@ -51,7 +51,7 @@ var preloaded = false,
 // general game settings
 let currentScore = 0,
     lastScore = 0,
-    highScore = 0,
+    highScore = getCookie("highscore"),
     gameReady = false,
     gamePlaying = false,
     hardMode = false,
@@ -294,7 +294,7 @@ function drawBackground() {
         let currentScoreWidth = sCtx.measureText(currentScoreText).width;
         sCtx.fillText(currentScoreText, (sCanvas.width / 2) - (currentScoreWidth / 2), 37.5);
     } else {
-        let lastScoreText = `Current Score: ${lastScore}`;
+        let lastScoreText = `Last Score: ${lastScore}`;
         let lastScoreWidth = sCtx.measureText(lastScoreText).width;
         sCtx.fillText(lastScoreText, (sCanvas.width / 2) - (lastScoreWidth / 2), 37.5);
     }
@@ -340,6 +340,7 @@ function drawObstacles() {
             currentScore++;
             // update highscore (if necessary)
             highScore = Math.max(currentScore, highScore);
+            setCookie("highscore", highScore, 7)
 
             // remove old pipe and add new one
             pipeObstacles = [...pipeObstacles.slice(1), [pipeObstacles[pipeObstacles.length - 1][0] + obstacle.gap + obstacle.width, pipeLocation()]];
@@ -425,7 +426,7 @@ function drawMainScreen() {
     // draw current highscore
     if (!settingsOpened) {
 
-        let highscoreText = `Current Score: ${highScore}`;
+        let highscoreText = `Highscore: ${highScore}`;
         let highscoreWidth = sCtx.measureText(highscoreText).width;
 
         ctx.font = "20px 'Press Start 2P'";
@@ -594,6 +595,35 @@ function audioPlayer(type) {
         }
     }
 }
+
+// Function to get a cookie value
+function getCookie(name) {
+    var cookieName = name + "=";
+    var cookieArray = document.cookie.split(";");
+    for (var i = 0; i < cookieArray.length; i++) {
+        var cookie = cookieArray[i];
+        while (cookie.charAt(0) === " ") {
+            cookie = cookie.substring(1, cookie.length);
+        }
+        if (cookie.indexOf(cookieName) === 0) {
+            return cookie.substring(cookieName.length, cookie.length);
+        }
+    }
+    return 0;
+}
+
+
+// Function to set a cookie
+function setCookie(name, value, days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
+}
+
 
 // windows resize
 window.addEventListener('resize', () => resizeCanvas());

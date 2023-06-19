@@ -14,6 +14,13 @@
 
 ## Overview
 
+| formalia     | value         |
+|--------------|---------------|
+| project name | Flappy Bird   |
+| author       | Florian Breit |
+| date         | 2023-06-19    |
+| version      | 1.0.0         |
+
 The game is a clone of the famous Flappy Bird game.
 The goal is to fly through the pipes without touching them.
 The game is over when the bird touches the ground or a pipe.
